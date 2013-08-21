@@ -35,7 +35,9 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.dialog'])
           // IW CUSTOM
           // to support custom modal class names - the core implementation was limited because it could not be dynamically set
           dialog.modalEl.removeClass(); // reset classes first
-          dialog.modalEl.addClass($rootScope.modalClass); //
+          if($rootScope.modalClass){
+            dialog.modalEl.addClass($rootScope.modalClass);
+          }
           // END IW CUSTOM
           dialog.open().then(function(){
             setClosed();

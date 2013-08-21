@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-copy'); 
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-html2js');
@@ -165,7 +165,7 @@ module.exports = function(grunt) {
       options: {
         dest: 'dist/docs',
         scripts: [
-          'angular.js', 
+          'angular.js',
           '<%= concat.dist_tpls.dest %>'
         ],
         styles: [
@@ -182,7 +182,7 @@ module.exports = function(grunt) {
     }
   });
 
-  //register before and after test tasks so we've don't have to change cli 
+  //register before and after test tasks so we've don't have to change cli
   //options on the goole's CI server
   grunt.registerTask('before-test', ['enforce', 'jshint', 'html2js']);
   grunt.registerTask('after-test', ['build', 'copy']);
@@ -194,6 +194,8 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', ['before-test', 'test', 'after-test']);
+  // Infowrap build
+  grunt.registerTask('infowrap', ['jshint', 'html2js', 'after-test']);
 
   grunt.registerTask('enforce', 'Install commit message enforce script if it doesn\'t exist', function() {
     if (!grunt.file.exists('.git/hooks/commit-msg')) {

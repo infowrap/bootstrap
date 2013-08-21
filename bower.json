@@ -1,0 +1,19 @@
+{
+  "name": "infowrap-ui-bootstrap",
+  "version": "0.0.0",
+  "main": "dist/ui-bootstrap-0.6.0-SNAPSHOT.js",
+  "ignore": [
+    "**/.*",
+    "docs",
+    "misc",
+    "node_modules",
+    "src",
+    "template",
+    "bower_components",
+    "test",
+    "tests",
+    "CONTRIBUTING.md",
+    "*.js",
+    "*.log"
+  ]
+}
