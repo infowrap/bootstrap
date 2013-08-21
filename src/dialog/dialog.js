@@ -82,16 +82,26 @@ dialogModule.provider("$dialog", function(){
 
       this.handledEscapeKey = function(e) {
         if (e.which === 27) {
-          self.close();
-          e.preventDefault();
-          self.$scope.$apply();
+          // IW CUSTOM
+          // Don't close modal if filepicker modal is open
+          if (!$rootScope.filepickerModalOpen) {
+            self.close();
+            e.preventDefault();
+            self.$scope.$apply();
+          }
+          // END IW CUSTOM
         }
       };
 
       this.handleBackDropClick = function(e) {
-        self.close();
-        e.preventDefault();
-        self.$scope.$apply();
+        // IW CUSTOM
+        // Don't close modal if filepicker modal is open
+        if (!$rootScope.filepickerModalOpen) {
+          self.close();
+          e.preventDefault();
+          self.$scope.$apply();
+        }
+        // END IW CUSTOM
       };
     }
 
@@ -199,9 +209,9 @@ dialogModule.provider("$dialog", function(){
     Dialog.prototype._addElementsToDom = function(){
       body.append(this.modalEl);
 
-      if(this.options.backdrop) { 
+      if(this.options.backdrop) {
         if (activeBackdrops.value === 0) {
-          body.append(this.backdropEl); 
+          body.append(this.backdropEl);
         }
         activeBackdrops.value++;
       }
@@ -212,10 +222,10 @@ dialogModule.provider("$dialog", function(){
     Dialog.prototype._removeElementsFromDom = function(){
       this.modalEl.remove();
 
-      if(this.options.backdrop) { 
+      if(this.options.backdrop) {
         activeBackdrops.value--;
         if (activeBackdrops.value === 0) {
-          this.backdropEl.remove(); 
+          this.backdropEl.remove();
         }
       }
       this._open = false;
