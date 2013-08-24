@@ -13,7 +13,6 @@
     "test",
     "tests",
     "CONTRIBUTING.md",
-    "*.js",
     "*.log"
   ]
 }
