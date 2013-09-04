@@ -130,6 +130,10 @@ dialogModule.provider("$dialog", function(){
         var $scope = locals.$scope = self.$scope = locals.$scope ? locals.$scope : $rootScope.$new();
 
         self.modalEl.html(locals.$template);
+        // Infowrap Custom
+        // Insert body content before compiling against scope - faster and more convenient for dynamic body content
+        self.modalEl.find('.modal-body').html(locals.$templateUrlData);
+        // END Infowrap Custom
 
         if (self.options.controller) {
           var ctrl = $controller(self.options.controller, locals);
@@ -237,10 +241,15 @@ dialogModule.provider("$dialog", function(){
 
       if (this.options.template) {
         templatePromise = $q.when(this.options.template);
-      } else if (this.options.templateUrl) {
+      }
+
+      // Infowrap custom
+      // allow dynamic modal body content updates
+      if (this.options.templateUrl) {
         templatePromise = $http.get(this.options.templateUrl, {cache:$templateCache})
         .then(function(response) { return response.data; });
       }
+      // End Infowrap custom
 
       angular.forEach(this.options.resolve || [], function(value, key) {
         keys.push(key);
@@ -249,6 +258,11 @@ dialogModule.provider("$dialog", function(){
 
       keys.push('$template');
       values.push(templatePromise);
+
+      // Infowrap custom
+      keys.push('$templateUrlData');
+      values.push(templateUrlPromise);
+      // End Infowrap custom
 
       return $q.all(values).then(function(values) {
         var locals = {};

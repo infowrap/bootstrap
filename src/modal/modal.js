@@ -1,5 +1,5 @@
 angular.module('ui.bootstrap.modal', ['ui.bootstrap.dialog'])
-.directive('modal', ['$parse', '$dialog', '$rootScope', function($parse, $dialog, $rootScope) {
+.directive('modal', ['$parse', '$dialog', '$rootScope', '$compile', '$http', function($parse, $dialog, $rootScope, $compile, $http) {
   return {
     restrict: 'EA',
     terminal: true,
@@ -38,16 +38,24 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.dialog'])
           if($rootScope.modalClass){
             dialog.modalEl.addClass($rootScope.modalClass);
           }
-          // END IW CUSTOM
-          dialog.open().then(function(){
+          dialog.open($rootScope.modalTemplateUrl).then(function(){
             setClosed();
           });
+          // END IW CUSTOM
         } else {
           //Make sure it is not opened
           if (dialog.isOpen()){
             dialog.close();
           }
         }
+      });
+
+      scope.$on('modal:changeBody', function(){
+        $http.get($rootScope.modalTemplateUrl, {cache:true}).then(function(response) {
+          $modalBody = angular.element(response.data)
+          $compile($modalBody)(scope)
+          dialog.modalEl.find('.modal-body').html($modalBody)
+        });
       });
     }
   };

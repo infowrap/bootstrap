@@ -1387,6 +1387,10 @@ dialogModule.provider("$dialog", function(){
         var $scope = locals.$scope = self.$scope = locals.$scope ? locals.$scope : $rootScope.$new();
 
         self.modalEl.html(locals.$template);
+        // Infowrap Custom
+        // Insert body content before compiling against scope - faster and more convenient for dynamic body content
+        self.modalEl.find('.modal-body').html(locals.$templateUrlData);
+        // END Infowrap Custom
 
         if (self.options.controller) {
           var ctrl = $controller(self.options.controller, locals);
@@ -1494,10 +1498,15 @@ dialogModule.provider("$dialog", function(){
 
       if (this.options.template) {
         templatePromise = $q.when(this.options.template);
-      } else if (this.options.templateUrl) {
+      }
+
+      // Infowrap custom
+      // allow dynamic modal body content updates
+      if (this.options.templateUrl) {
         templatePromise = $http.get(this.options.templateUrl, {cache:$templateCache})
         .then(function(response) { return response.data; });
       }
+      // End Infowrap custom
 
       angular.forEach(this.options.resolve || [], function(value, key) {
         keys.push(key);
@@ -1506,6 +1515,11 @@ dialogModule.provider("$dialog", function(){
 
       keys.push('$template');
       values.push(templatePromise);
+
+      // Infowrap custom
+      keys.push('$templateUrlData');
+      values.push(templateUrlPromise);
+      // End Infowrap custom
 
       return $q.all(values).then(function(values) {
         var locals = {};
@@ -1600,7 +1614,7 @@ angular.module('ui.bootstrap.dropdownToggle', []).directive('dropdownToggle', ['
   };
 }]);
 angular.module('ui.bootstrap.modal', ['ui.bootstrap.dialog'])
-.directive('modal', ['$parse', '$dialog', '$rootScope', function($parse, $dialog, $rootScope) {
+.directive('modal', ['$parse', '$dialog', '$rootScope', '$compile', '$http', function($parse, $dialog, $rootScope, $compile, $http) {
   return {
     restrict: 'EA',
     terminal: true,
@@ -1639,16 +1653,24 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.dialog'])
           if($rootScope.modalClass){
             dialog.modalEl.addClass($rootScope.modalClass);
           }
-          // END IW CUSTOM
-          dialog.open().then(function(){
+          dialog.open($rootScope.modalTemplateUrl).then(function(){
             setClosed();
           });
+          // END IW CUSTOM
         } else {
           //Make sure it is not opened
           if (dialog.isOpen()){
             dialog.close();
           }
         }
+      });
+
+      scope.$on('modal:changeBody', function(){
+        $http.get($rootScope.modalTemplateUrl, {cache:true}).then(function(response) {
+          $modalBody = angular.element(response.data)
+          $compile($modalBody)(scope)
+          dialog.modalEl.find('.modal-body').html($modalBody)
+        });
       });
     }
   };
