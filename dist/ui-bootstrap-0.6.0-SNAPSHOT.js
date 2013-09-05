@@ -1493,7 +1493,7 @@ dialogModule.provider("$dialog", function(){
 
     // Loads all `options.resolve` members to be used as locals for the controller associated with the dialog.
     Dialog.prototype._loadResolves = function(){
-      var values = [], keys = [], templatePromise, self = this;
+      var values = [], keys = [], templatePromise, templateUrlPromise, self = this;
 
       if (this.options.template) {
         templatePromise = $q.when(this.options.template);
@@ -1502,7 +1502,7 @@ dialogModule.provider("$dialog", function(){
       // Infowrap custom
       // allow dynamic modal body content updates
       if (this.options.templateUrl) {
-        templatePromise = $http.get(this.options.templateUrl, {cache:$templateCache})
+        templateUrlPromise = $http.get(this.options.templateUrl, {cache:$templateCache})
         .then(function(response) { return response.data; });
       }
       // End Infowrap custom
