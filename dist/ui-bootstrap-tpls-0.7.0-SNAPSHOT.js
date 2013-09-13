@@ -1491,7 +1491,7 @@ angular.module('ui.bootstrap.modal', [])
 
         // IW CUSTOM
         // modified to support breadcrumb titled modals
-        if (openedWindows.length === 0) {
+        if (openedWindows.length() === 0) {
           openedWindows.add(modalInstance, {
             deferred: modal.deferred,
             modalScope: modal.scope,
