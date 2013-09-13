@@ -1516,14 +1516,14 @@ angular.module('ui.bootstrap.modal', [])
           // destroy current modal-body scope before inserting new content modal
           var modalWindow = openedWindows.top().value;
           var modalBody = angular.element('.modal .modal-body');
-          var modalBodyScope = modalBody.find('div').first().scope();
 
-          //destroy scope
-          modalBodyScope.$destroy();
+          // destroy current content scope
+          var modalContentScope = modalBody.find('div[data-ng-transclude] > div').scope();
+          modalContentScope.$destroy();
 
           // insert new body
           var modalContent = $compile(angular.element(modal.content))(modal.scope);
-          modyBody.html(modalContent);
+          modalBody.html(modalContent);
 
           // update windowClass
           modalWindow.modalScope.windowClass = modal.windowClass;
