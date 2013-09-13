@@ -1539,7 +1539,10 @@ angular.module('ui.bootstrap.modal', [])
       };
 
       $modalStack.close = function (modalInstance, result) {
-        var modal = openedWindows.get(modalInstance);
+        // var modal = openedWindows.get(modalInstance);
+        // IW CUSTOM
+        // always grab top window, since we only want one 1 modal ever
+        var modal = openedWindows.top();
         if (modal) {
           modal.value.deferred.resolve(result);
           removeModalWindow(modalInstance);
@@ -1547,7 +1550,10 @@ angular.module('ui.bootstrap.modal', [])
       };
 
       $modalStack.dismiss = function (modalInstance, reason) {
-        var modalWindow = openedWindows.get(modalInstance).value;
+        // var modalWindow = openedWindows.get(modalInstance).value;
+        // IW CUSTOM
+        // always grab top window, since we only want one 1 modal ever
+        var modalWindow = openedWindows.top().value;
         if (modalWindow) {
           modalWindow.deferred.reject(reason);
           removeModalWindow(modalInstance);
