@@ -1518,7 +1518,7 @@ angular.module('ui.bootstrap.modal', [])
           var modalBody = angular.element('.modal .modal-body');
 
           // destroy current content scope
-          var modalContentScope = modalBody.find('div[data-ng-transclude] > div');
+          var modalContentScope = modalBody.find('> div[data-ng-transclude] > div');
           if (modalContentScope.length === 0) {
             // was not a root modal window (first crumb)
             modalContentScope = modalBody.find('> div').scope();
