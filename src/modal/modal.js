@@ -127,10 +127,15 @@ angular.module('ui.bootstrap.modal', [])
 
       function removeModalWindow(modalInstance) {
 
-        var modalWindow = openedWindows.get(modalInstance).value;
+        // var modalWindow = openedWindows.get(modalInstance).value;
+        // IW CUSTOM
+        // we only work with 1 modal
+        var modalWindow = openedWindows.top().value;
 
         //clean up the stack
-        openedWindows.remove(modalInstance);
+        // openedWindows.remove(modalInstance);
+        // only deal with the 1 modal
+        openedWindows.removeTop();
 
         //remove window DOM element
         modalWindow.modalDomEl.remove();
