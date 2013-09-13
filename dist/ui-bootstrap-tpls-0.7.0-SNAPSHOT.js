@@ -1489,27 +1489,48 @@ angular.module('ui.bootstrap.modal', [])
 
       $modalStack.open = function (modalInstance, modal) {
 
-        openedWindows.add(modalInstance, {
-          deferred: modal.deferred,
-          modalScope: modal.scope,
-          backdrop: modal.backdrop,
-          keyboard: modal.keyboard
-        });
+        // IW CUSTOM
+        // modified to support breadcrumb titled modals
+        if (!$rootScope.modalEnabled) {
+          openedWindows.add(modalInstance, {
+            deferred: modal.deferred,
+            modalScope: modal.scope,
+            backdrop: modal.backdrop,
+            keyboard: modal.keyboard
+          });
 
-        var angularDomEl = angular.element('<div modal-window></div>');
-        angularDomEl.attr('window-class', modal.windowClass);
-        angularDomEl.attr('index', openedWindows.length() - 1);
-        angularDomEl.html(modal.content);
+          var angularDomEl = angular.element('<div modal-window></div>');
+          angularDomEl.attr('window-class', modal.windowClass);
+          angularDomEl.attr('index', openedWindows.length() - 1);
+          angularDomEl.html(modal.content);
 
-        var modalDomEl = $compile(angularDomEl)(modal.scope);
-        openedWindows.top().value.modalDomEl = modalDomEl;
-        body.append(modalDomEl);
+          var modalDomEl = $compile(angularDomEl)(modal.scope);
+          openedWindows.top().value.modalDomEl = modalDomEl;
+          body.append(modalDomEl);
 
-        if (backdropIndex() >= 0 && !backdropDomEl) {
-            backdropjqLiteEl = angular.element('<div modal-backdrop></div>');
-            backdropDomEl = $compile(backdropjqLiteEl)(backdropScope);
-            body.append(backdropDomEl);
+          if (backdropIndex() >= 0 && !backdropDomEl) {
+              backdropjqLiteEl = angular.element('<div modal-backdrop></div>');
+              backdropDomEl = $compile(backdropjqLiteEl)(backdropScope);
+              body.append(backdropDomEl);
+          }
+        } else {
+          // destroy current modal-body scope before inserting new content modal
+          var modalWindow = openedWindows.top().value;
+          var modalBody = angular.element('.modal .modal-body');
+          var modalBodyScope = modalBody.find('div').first().scope();
+
+          //destroy scope
+          modalBodyScope.$destroy();
+
+          // insert new body
+          var modalContent = $compile(angular.element(modal.content))(modal.scope);
+          modyBody.html(modalContent);
+
+          // update windowClass
+          modalWindow.modalScope.windowClass = modal.windowClass;
+
         }
+
       };
 
       $modalStack.close = function (modalInstance, result) {
