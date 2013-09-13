@@ -1,7 +1,7 @@
 {
   "name": "infowrap-ui-bootstrap",
-  "version": "infowrap0.1.5",
-  "main": "dist/ui-bootstrap-0.6.0-SNAPSHOT.js",
+  "version": "infowrap0.1.6",
+  "main": "dist/ui-bootstrap-0.7.0-SNAPSHOT.js",
   "ignore": [
     "**/.*",
     "docs",
