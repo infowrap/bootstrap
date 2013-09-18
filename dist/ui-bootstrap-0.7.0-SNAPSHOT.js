@@ -348,19 +348,18 @@ angular.module('ui.bootstrap.bindHtml', [])
   });
 angular.module('ui.bootstrap.buttons', [])
 
-  .constant('buttonConfig', {
-    activeClass:'active',
-    toggleEvent:'click'
-  })
+.constant('buttonConfig', {
+  activeClass: 'active',
+  toggleEvent: 'click'
+})
 
-  .directive('btnRadio', ['buttonConfig', function (buttonConfig) {
+.directive('btnRadio', ['buttonConfig', function (buttonConfig) {
   var activeClass = buttonConfig.activeClass || 'active';
   var toggleEvent = buttonConfig.toggleEvent || 'click';
 
   return {
-
-    require:'ngModel',
-    link:function (scope, element, attrs, ngModelCtrl) {
+    require: 'ngModel',
+    link: function (scope, element, attrs, ngModelCtrl) {
 
       //model -> UI
       ngModelCtrl.$render = function () {
@@ -380,14 +379,13 @@ angular.module('ui.bootstrap.buttons', [])
   };
 }])
 
-  .directive('btnCheckbox', ['buttonConfig', function (buttonConfig) {
-
+.directive('btnCheckbox', ['buttonConfig', function (buttonConfig) {
   var activeClass = buttonConfig.activeClass || 'active';
   var toggleEvent = buttonConfig.toggleEvent || 'click';
 
   return {
-    require:'ngModel',
-    link:function (scope, element, attrs, ngModelCtrl) {
+    require: 'ngModel',
+    link: function (scope, element, attrs, ngModelCtrl) {
 
       function getTrueValue() {
         var trueValue = scope.$eval(attrs.btnCheckboxTrue);
@@ -414,6 +412,7 @@ angular.module('ui.bootstrap.buttons', [])
     }
   };
 }]);
+
 /**
 * @ngdoc overview
 * @name ui.bootstrap.carousel
@@ -1530,7 +1529,9 @@ angular.module('ui.bootstrap.modal', [])
           } else {
             modalContentScope = modalContentScope.scope();
           }
-          modalContentScope.$destroy();
+          if (modalContentScope) {
+            modalContentScope.$destroy();
+          }
 
           // insert new body
           var modalContent = $compile(angular.element(modal.content))(modal.scope);
@@ -2396,29 +2397,20 @@ angular.module('ui.bootstrap.rating', [])
   this.stateOn = angular.isDefined($attrs.stateOn) ? $scope.$parent.$eval($attrs.stateOn) : ratingConfig.stateOn;
   this.stateOff = angular.isDefined($attrs.stateOff) ? $scope.$parent.$eval($attrs.stateOff) : ratingConfig.stateOff;
 
-  this.createDefaultRange = function(len) {
-    var defaultStateObject = {
+  this.createRateObjects = function(states) {
+    var defaultOptions = {
       stateOn: this.stateOn,
       stateOff: this.stateOff
     };
 
-    var states = new Array(len);
-    for (var i = 0; i < len; i++) {
-      states[i] = defaultStateObject;
-    }
-    return states;
-  };
-
-  this.normalizeRange = function(states) {
     for (var i = 0, n = states.length; i < n; i++) {
-      states[i].stateOn = states[i].stateOn || this.stateOn;
-      states[i].stateOff = states[i].stateOff || this.stateOff;
+      states[i] = angular.extend({ index: i }, defaultOptions, states[i]);
     }
     return states;
   };
 
   // Get objects used in template
-  $scope.range = angular.isDefined($attrs.ratingStates) ?  this.normalizeRange(angular.copy($scope.$parent.$eval($attrs.ratingStates))): this.createDefaultRange(this.maxRange);
+  $scope.range = angular.isDefined($attrs.ratingStates) ?  this.createRateObjects(angular.copy($scope.$parent.$eval($attrs.ratingStates))): this.createRateObjects(new Array(this.maxRange));
 
   $scope.rate = function(value) {
     if ( $scope.readonly || $scope.value === value) {
