@@ -202,7 +202,9 @@ angular.module('ui.bootstrap.modal', [])
           } else {
             modalContentScope = modalContentScope.scope();
           }
-          modalContentScope.$destroy();
+          if (modalContentScope) {
+            modalContentScope.$destroy();
+          }
 
           // insert new body
           var modalContent = $compile(angular.element(modal.content))(modal.scope);
