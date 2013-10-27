@@ -65,6 +65,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       //expressions used by typeahead
       var parserResult = typeaheadParser.parse(attrs.typeahead);
 
+      var hasFocus;
 
       //pop-up element used to display matches
       var popUpEl = angular.element('<typeahead-popup></typeahead-popup>');
@@ -100,7 +101,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
 
           //it might happen that several async queries were in progress if a user were typing fast
           //but we are interested only in responses that correspond to the current view value
-          if (inputValue === modelCtrl.$viewValue) {
+          if (inputValue === modelCtrl.$viewValue && hasFocus) {
             if (matches.length > 0) {
 
               scope.activeIdx = 0;
@@ -145,7 +146,8 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       //$parsers kick-in on all the changes coming from the view as well as manually triggered by $setViewValue
       modelCtrl.$parsers.unshift(function (inputValue) {
 
-        resetMatches();
+        hasFocus = true;
+
         if (inputValue && inputValue.length >= minSearch) {
           if (waitTime > 0) {
             if (timeoutPromise) {
@@ -157,13 +159,22 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
           } else {
             getMatchesAsync(inputValue);
           }
+        } else {
+          isLoadingSetter(originalScope, false);
+          resetMatches();
         }
 
         if (isEditable) {
           return inputValue;
         } else {
-          modelCtrl.$setValidity('editable', false);
-          return undefined;
+          if (!inputValue) {
+            // Reset in case user had typed something previously.
+            modelCtrl.$setValidity('editable', true);
+            return inputValue;
+          } else {
+            modelCtrl.$setValidity('editable', false);
+            return undefined;
+          }
         }
       });
 
@@ -217,6 +228,9 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
 
         //typeahead is open and an "interesting" key was pressed
         if (scope.matches.length === 0 || HOT_KEYS.indexOf(evt.which) === -1) {
+          if (evt.which === 13) {
+            evt.preventDefault();
+          }
           return;
         }
 
@@ -241,6 +255,10 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
           resetMatches();
           scope.$digest();
         }
+      });
+
+      element.bind('blur', function (evt) {
+        hasFocus = false;
       });
 
       // Keep reference to click handler to unbind it.

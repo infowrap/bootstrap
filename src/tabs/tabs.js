@@ -15,11 +15,9 @@ angular.module('ui.bootstrap.tabs', [])
   };
 })
 
-.controller('TabsetController', ['$scope', '$element',
-function TabsetCtrl($scope, $element) {
-
+.controller('TabsetController', ['$scope', function TabsetCtrl($scope) {
   var ctrl = this,
-    tabs = ctrl.tabs = $scope.tabs = [];
+      tabs = ctrl.tabs = $scope.tabs = [];
 
   ctrl.select = function(tab) {
     angular.forEach(tabs, function(tab) {
@@ -176,8 +174,7 @@ function TabsetCtrl($scope, $element) {
   </file>
 </example>
  */
-.directive('tab', ['$parse', '$http', '$templateCache', '$compile',
-function($parse, $http, $templateCache, $compile) {
+.directive('tab', ['$parse', function($parse) {
   return {
     require: '^tabset',
     restrict: 'EA',
@@ -199,8 +196,13 @@ function($parse, $http, $templateCache, $compile) {
         if (attrs.active) {
           getActive = $parse(attrs.active);
           setActive = getActive.assign;
-          scope.$parent.$watch(getActive, function updateActive(value) {
-            scope.active = !!value;
+          scope.$parent.$watch(getActive, function updateActive(value, oldVal) {
+            // Avoid re-initializing scope.active as it is already initialized
+            // below. (watcher is called async during init with value ===
+            // oldVal)
+            if (value !== oldVal) {
+              scope.active = !!value;
+            }
           });
           scope.active = getActive(scope.$parent);
         } else {
@@ -208,6 +210,8 @@ function($parse, $http, $templateCache, $compile) {
         }
 
         scope.$watch('active', function(active) {
+          // Note this watcher also initializes and assigns scope.active to the
+          // attrs.active expression.
           setActive(scope.$parent, active);
           if (active) {
             tabsetCtrl.select(scope);
@@ -234,9 +238,6 @@ function($parse, $http, $templateCache, $compile) {
         scope.$on('$destroy', function() {
           tabsetCtrl.removeTab(scope);
         });
-        if (scope.active) {
-          setActive(scope.$parent, true);
-        }
 
 
         //We need to transclude later, once the content container is ready.
@@ -262,7 +263,7 @@ function($parse, $http, $templateCache, $compile) {
   };
 }])
 
-.directive('tabContentTransclude', ['$compile', '$parse', function($compile, $parse) {
+.directive('tabContentTransclude', function() {
   return {
     restrict: 'A',
     require: '^tabset',
@@ -291,9 +292,9 @@ function($parse, $http, $templateCache, $compile) {
       node.tagName.toLowerCase() === 'data-tab-heading'
     );
   }
-}])
+})
 
-.directive('tabsetTitles', ['$http', function($http) {
+.directive('tabsetTitles', function() {
   return {
     restrict: 'A',
     require: '^tabset',
@@ -310,7 +311,4 @@ function($parse, $http, $templateCache, $compile) {
       }
     }
   };
-}])
-
-;
-
+});
