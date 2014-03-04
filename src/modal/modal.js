@@ -154,11 +154,15 @@ angular.module('ui.bootstrap.modal', [])
         var modal;
 
         if (evt.which === 27) {
-          modal = openedWindows.top();
-          if (modal && modal.value.keyboard) {
-            $rootScope.$apply(function () {
-              $modalStack.dismiss(modal.key);
-            });
+          // IW CUSTOM
+          // block esc close if modal is forcing user action
+          if (!$rootScope.modalForceAction){
+            modal = openedWindows.top();
+            if (modal && modal.value.keyboard) {
+              $rootScope.$apply(function () {
+                $modalStack.dismiss(modal.key);
+              });
+            }
           }
         }
       });
