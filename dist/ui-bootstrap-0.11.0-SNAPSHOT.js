@@ -1551,6 +1551,15 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
 
         scope.animate = false;
 
+        scope.close = function (evt) {
+          var modal = $modalStack.getTop();
+          if (modal && modal.value.backdrop && modal.value.backdrop != 'static' && (evt.target === evt.currentTarget)) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            $modalStack.dismiss(modal.key, 'backdrop click');
+          }
+        };
+
         //trigger CSS transitions
         $timeout(function () {
           scope.animate = true;
@@ -1768,9 +1777,9 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         // var modal = openedWindows.get(modalInstance);
         // IW CUSTOM
         // always grab top window, since we only want one 1 modal ever
-        var modalWindow = openedWindows.top().value;
-        if (modalWindow) {
-          modalWindow.deferred.resolve(result);
+        var modal = openedWindows.top();
+        if (modal) {
+          modal.value.deferred.resolve(result);
           removeModalWindow(modalInstance);
         }
       };
