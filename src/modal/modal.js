@@ -231,21 +231,26 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
             keyboard: modal.keyboard
           });
 
+          var body = $document.find('body').eq(0),
+              currBackdropIndex = backdropIndex();
+
+          if (currBackdropIndex >= 0 && !backdropDomEl) {
+            backdropScope = $rootScope.$new(true);
+            backdropScope.index = currBackdropIndex;
+            backdropDomEl = $compile('<div modal-backdrop></div>')(backdropScope);
+            body.append(backdropDomEl);
+          }
+
           var angularDomEl = angular.element('<div modal-window></div>');
           angularDomEl.attr('window-class', modal.windowClass);
           angularDomEl.attr('index', openedWindows.length() - 1);
+          angularDomEl.attr('animate', 'animate');
           angularDomEl.html(modal.content);
 
-          var body = $document.find('body').eq(0);
           var modalDomEl = $compile(angularDomEl)(modal.scope);
           openedWindows.top().value.modalDomEl = modalDomEl;
           body.append(modalDomEl);
 
-          if (backdropIndex() >= 0 && !backdropDomEl) {
-              backdropjqLiteEl = angular.element('<div modal-backdrop></div>');
-              backdropDomEl = $compile(backdropjqLiteEl)(backdropScope);
-              body.append(backdropDomEl);
-          }
         } else {
           // destroy current modal-body scope before inserting new content modal
           var modalWindow = openedWindows.top().value;
@@ -278,9 +283,9 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         // var modal = openedWindows.get(modalInstance);
         // IW CUSTOM
         // always grab top window, since we only want one 1 modal ever
-        var modal = openedWindows.top();
-        if (modal) {
-          modal.value.deferred.resolve(result);
+        var modalWindow = openedWindows.top().value;
+        if (modalWindow) {
+          modalWindow.deferred.resolve(result);
           removeModalWindow(modalInstance);
         }
       };
