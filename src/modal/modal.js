@@ -236,6 +236,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
           angularDomEl.attr('index', openedWindows.length() - 1);
           angularDomEl.html(modal.content);
 
+          var body = $document.find('body').eq(0);
           var modalDomEl = $compile(angularDomEl)(modal.scope);
           openedWindows.top().value.modalDomEl = modalDomEl;
           body.append(modalDomEl);

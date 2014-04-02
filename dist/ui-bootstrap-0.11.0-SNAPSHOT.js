@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
 
- * Version: 0.11.0-SNAPSHOT - 2014-04-01
+ * Version: 0.11.0-SNAPSHOT - 2014-04-02
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdown","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -1721,6 +1721,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
           angularDomEl.attr('index', openedWindows.length() - 1);
           angularDomEl.html(modal.content);
 
+          var body = $document.find('body').eq(0);
           var modalDomEl = $compile(angularDomEl)(modal.scope);
           openedWindows.top().value.modalDomEl = modalDomEl;
           body.append(modalDomEl);
