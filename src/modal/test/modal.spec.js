@@ -3,9 +3,17 @@ describe('$modal', function () {
   var $modal, $modalProvider;
 
   var triggerKeyDown = function (element, keyCode) {
-    var e = $.Event("keydown");
+    var e = $.Event('keydown');
     e.which = keyCode;
     element.trigger(e);
+  };
+
+  var waitForBackdropAnimation = function () {
+    inject(function ($transition) {
+      if ($transition.transitionEndEventName) {
+        $timeout.flush();
+      }
+    });
   };
 
   beforeEach(module('ui.bootstrap.modal'));
@@ -25,13 +33,13 @@ describe('$modal', function () {
     $modal = _$modal_;
   }));
 
-  beforeEach(inject(function ($rootScope) {
+  beforeEach(function () {
     this.addMatchers({
 
       toBeResolvedWith: function(value) {
         var resolved;
         this.message = function() {
-          return "Expected '" + angular.mock.dump(this.actual) + "' to be resolved with '" + value + "'.";
+          return 'Expected "' + angular.mock.dump(this.actual) + '" to be resolved with "' + value + '".';
         };
         this.actual.then(function(result){
           resolved = result;
@@ -44,7 +52,7 @@ describe('$modal', function () {
       toBeRejectedWith: function(value) {
         var rejected;
         this.message = function() {
-          return "Expected '" + angular.mock.dump(this.actual) + "' to be rejected with '" + value + "'.";
+          return 'Expected "' + angular.mock.dump(this.actual) + '" to be rejected with "' + value + '".';
         };
         this.actual.then(angular.noop, function(reason){
           rejected = reason;
@@ -56,10 +64,10 @@ describe('$modal', function () {
 
       toHaveModalOpenWithContent: function(content, selector) {
 
-        var contentToCompare, modalDomEls = this.actual.find('body > div.modal');
+        var contentToCompare, modalDomEls = this.actual.find('body > div.modal > div.modal-dialog > div.modal-content');
 
         this.message = function() {
-          return "Expected '" + angular.mock.dump(modalDomEls) + "' to be open with '" + content + "'.";
+          return '"Expected "' + angular.mock.dump(modalDomEls) + '" to be open with "' + content + '".';
         };
 
         contentToCompare = selector ? modalDomEls.find(selector) : modalDomEls;
@@ -76,18 +84,19 @@ describe('$modal', function () {
 
         var backdropDomEls = this.actual.find('body > div.modal-backdrop');
         this.message = function() {
-          return "Expected '" + angular.mock.dump(backdropDomEls) + "' to be a backdrop element'.";
+          return 'Expected "' + angular.mock.dump(backdropDomEls) + '" to be a backdrop element".';
         };
 
         return backdropDomEls.length === 1;
       }
     });
-  }));
+  });
 
   afterEach(function () {
     var body = $document.find('body');
     body.find('div.modal').remove();
     body.find('div.modal-backdrop').remove();
+    body.removeClass('modal-open');
   });
 
   function open(modalOptions) {
@@ -103,6 +112,7 @@ describe('$modal', function () {
 
   function dismiss(modal, reason) {
     modal.dismiss(reason);
+    $timeout.flush();
     $rootScope.$digest();
   }
 
@@ -119,6 +129,8 @@ describe('$modal', function () {
       dismiss(modal, 'closing in test');
 
       expect($document).toHaveModalsOpen(0);
+
+      waitForBackdropAnimation();
       expect($document).not.toHaveBackdrop();
     });
 
@@ -134,6 +146,8 @@ describe('$modal', function () {
       dismiss(modal, 'closing in test');
 
       expect($document).toHaveModalsOpen(0);
+
+      waitForBackdropAnimation();
       expect($document).not.toHaveBackdrop();
     });
 
@@ -143,6 +157,7 @@ describe('$modal', function () {
       expect($document).toHaveModalsOpen(1);
 
       triggerKeyDown($document, 27);
+      $timeout.flush();
       $rootScope.$digest();
 
       expect($document).toHaveModalsOpen(0);
@@ -153,7 +168,8 @@ describe('$modal', function () {
       var modal = open({template: '<div>Content</div>'});
       expect($document).toHaveModalsOpen(1);
 
-      $document.find('body > div.modal-backdrop').click();
+      $document.find('body > div.modal').click();
+      $timeout.flush();
       $rootScope.$digest();
 
       expect($document).toHaveModalsOpen(0);
@@ -213,7 +229,6 @@ describe('$modal', function () {
       expect($document).toHaveModalOpenWithContent('Content', 'div');
       expect($document).not.toHaveBackdrop();
     });
-
   });
 
   describe('option by option', function () {
@@ -320,7 +335,7 @@ describe('$modal', function () {
 
     describe('scope', function () {
 
-      it('should custom scope if provided', function () {
+      it('should use custom scope if provided', function () {
         var $scope = $rootScope.$new();
         $scope.fromScope = 'Content from custom scope';
         open({
@@ -328,6 +343,17 @@ describe('$modal', function () {
           scope: $scope
         });
         expect($document).toHaveModalOpenWithContent('Content from custom scope', 'div');
+      });
+
+      it('should create and use child of $rootScope if custom scope not provided', function () {
+
+        var scopeTailBefore = $rootScope.$$childTail;
+
+        $rootScope.fromScope = 'Content from root scope';
+        open({
+          template: '<div>{{fromScope}}</div>'
+        });
+        expect($document).toHaveModalOpenWithContent('Content from root scope', 'div');
       });
     });
 
@@ -373,6 +399,24 @@ describe('$modal', function () {
 
         expect($document).toHaveModalOpenWithContent('Static backdrop', 'div');
         expect($document).toHaveBackdrop();
+      });
+
+      it('should animate backdrop on each modal opening', function () {
+
+        var modal = open({ template: '<div>With backdrop</div>' });
+        var backdropEl = $document.find('body > div.modal-backdrop');
+        expect(backdropEl).not.toHaveClass('in');
+
+        $timeout.flush();
+        expect(backdropEl).toHaveClass('in');
+
+        dismiss(modal);
+        waitForBackdropAnimation();
+
+        modal = open({ template: '<div>With backdrop</div>' });
+        backdropEl = $document.find('body > div.modal-backdrop');
+        expect(backdropEl).not.toHaveClass('in');
+
       });
     });
 
@@ -434,6 +478,24 @@ describe('$modal', function () {
       $rootScope.$digest();
 
       expect($document).toHaveBackdrop();
+    });
+
+    it('should add "modal-open" class when a modal gets opened', function () {
+
+      var body = $document.find('body');
+      expect(body).not.toHaveClass('modal-open');
+
+      var modal1 = open({template: '<div>Content1</div>'});
+      expect(body).toHaveClass('modal-open');
+
+      var modal2 = open({template: '<div>Content1</div>'});
+      expect(body).toHaveClass('modal-open');
+
+      dismiss(modal1);
+      expect(body).toHaveClass('modal-open');
+
+      dismiss(modal2);
+      expect(body).not.toHaveClass('modal-open');
     });
   });
 });

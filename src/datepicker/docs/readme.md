@@ -5,27 +5,23 @@ The datepicker shows dates that come from other than the main month being displa
 
 Everything is formatted using the [date filter](http://docs.angularjs.org/api/ng.filter:date) and thus is also localized.
 
-### Settings ###
+### Datepicker Settings ###
 
 All settings can be provided as attributes in the `<datepicker>` or globally configured through the `datepickerConfig`.
 
- * `ng-model` <i class="icon-eye-open"></i>
+ * `ng-model` <i class="glyphicon glyphicon-eye-open"></i>
  	:
  	The date object.
 
- * `show-weeks` <i class="icon-eye-open"></i>
- 	_(Defaults: true)_ :
- 	Whether to display week numbers.
+ * `datepicker-mode` <i class="glyphicon glyphicon-eye-open"></i>
+   _(Defaults: 'day')_ :
+   Current mode of the datepicker _(day|month|year)_. Can be used to initialize datepicker to specific mode.
 
- * `starting-day`
- 	_(Defaults: 0)_ :
- 	Starting day of the week from 0-6 (0=Sunday, ..., 6=Saturday).
-
- * `min` <i class="icon-eye-open"></i>
+ * `min-date` <i class="glyphicon glyphicon-eye-open"></i>
  	_(Default: null)_ :
  	Defines the minimum available date.
 
- * `max` <i class="icon-eye-open"></i>
+ * `max-date` <i class="glyphicon glyphicon-eye-open"></i>
  	_(Default: null)_ :
  	Defines the maximum available date.
 
@@ -33,30 +29,84 @@ All settings can be provided as attributes in the `<datepicker>` or globally con
  	_(Default: null)_ :
  	An optional expression to disable visible options based on passing date and current mode _(day|month|year)_.
 
- * `day-format`
+ * `show-weeks`
+ 	_(Defaults: true)_ :
+ 	Whether to display week numbers.
+
+ * `starting-day`
+ 	_(Defaults: 0)_ :
+ 	Starting day of the week from 0-6 (0=Sunday, ..., 6=Saturday).
+
+ * `init-date`
+ 	:
+ 	The initial date view when no model value is not specified.
+
+ * `min-mode`
+   _(Defaults: 'day')_ :
+   Set a lower limit for mode.
+
+ * `max-mode`
+   _(Defaults: 'year')_ :
+   Set an upper limit for mode.
+
+ * `format-day`
  	_(Default: 'dd')_ :
  	Format of day in month.
 
- * `month-format`
+ * `format-month`
  	_(Default: 'MMMM')_ :
  	Format of month in year.
 
- * `year-format`
+ * `format-year`
  	_(Default: 'yyyy')_ :
  	Format of year in year range.
+
+ * `format-day-header`
+ 	_(Default: 'EEE')_ :
+ 	Format of day in week header.
+
+ * `format-day-title-`
+ 	_(Default: 'MMMM yyyy')_ :
+ 	Format of title when selecting day.
+
+ * `format-month-title`
+ 	_(Default: 'yyyy')_ :
+ 	Format of title when selecting month.
 
  * `year-range`
  	_(Default: 20)_ :
  	Number of years displayed in year selection.
 
- * `day-header-format`
- 	_(Default: 'EEE')_ :
- 	Format of day in week header.
 
- * `day-title-format`
- 	_(Default: 'MMMM yyyy')_ :
- 	Format of title when selecting day.
+### Popup Settings ###
 
- * `month-title-format`
- 	_(Default: 'yyyy')_ :
- 	Format of title when selecting month.
+Options for datepicker can be passed as JSON using the `datepicker-options` attribute.
+Specific settings for the `datepicker-popup`, that can globally configured through the `datepickerPopupConfig`, are:
+
+ * `datepicker-popup`
+ 	_(Default: 'yyyy-MM-dd')_ :
+ 	The format for displayed dates.
+
+ * `show-button-bar`
+ 	_(Default: true)_ :
+ 	Whether to display a button bar underneath the datepicker.
+
+ * `current-text`
+ 	_(Default: 'Today')_ :
+ 	The text to display for the current day button.
+
+ * `clear-text`
+ 	_(Default: 'Clear')_ :
+ 	The text to display for the clear button.
+
+ * `close-text`
+ 	_(Default: 'Done')_ :
+ 	The text to display for the close button.
+
+ * `close-on-date-selection`
+ 	_(Default: true)_ :
+ 	Whether to close calendar when a date is chosen.
+
+ * `datepicker-append-to-body`
+  _(Default: false)_:
+  Append the datepicker popup element to `body`, rather than inserting after `datepicker-popup`. For global configuration, use `datepickerPopupConfig.appendToBody`.
