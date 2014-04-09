@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
 
- * Version: 0.11.0-SNAPSHOT - 2014-04-02
+ * Version: 0.11.0-SNAPSHOT - 2014-04-09
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdown","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -1644,21 +1644,25 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         //modalWindow.modalDomEl.remove();
 
         //remove window DOM element
-        removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, 300, function() {
+        // IW CUSTOM
+        // We don't use animation with our modals so don't even considerate it, causes weird glitches with view anyway
+        // removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, 300, function() {
           modalWindow.modalScope.$destroy();
           body.toggleClass(OPENED_MODAL_CLASS, openedWindows.length() > 0);
           checkRemoveBackdrop();
-        });
+        // });
       }
 
       function checkRemoveBackdrop() {
           //remove backdrop if no longer needed
           if (backdropDomEl && backdropIndex() == -1) {
             var backdropScopeRef = backdropScope;
-            removeAfterAnimate(backdropDomEl, backdropScope, 150, function () {
+            // IW CUSTOM
+            // We don't use animation with our modals so don't even considerate it, causes weird glitches with view anyway
+            // removeAfterAnimate(backdropDomEl, backdropScope, 150, function () {
               backdropScopeRef.$destroy();
               backdropScopeRef = null;
-            });
+            // });
             backdropDomEl = undefined;
             backdropScope = undefined;
           }
