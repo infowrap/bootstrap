@@ -1549,7 +1549,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
       templateUrl: 'template/modal/backdrop.html',
       link: function (scope) {
 
-        scope.animate = false;
+        // scope.animate = false;
 
         scope.close = function (evt) {
           var modal = $modalStack.getTop();
@@ -1561,9 +1561,9 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         };
 
         //trigger CSS transitions
-        $timeout(function () {
-          scope.animate = true;
-        });
+        // $timeout(function () {
+        //   scope.animate = true;
+        // });
       }
     };
   }])
@@ -1581,12 +1581,12 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
       link: function (scope, element, attrs) {
         scope.windowClass = attrs.windowClass || '';
 
-        $timeout(function () {
-          // trigger CSS transitions
-          scope.animate = true;
-          // focus a freshly-opened modal
-          element[0].focus();
-        });
+        // $timeout(function () {
+        //   // trigger CSS transitions
+        //   scope.animate = true;
+        //   // focus a freshly-opened modal
+        //   element[0].focus();
+        // });
 
         scope.close = function (evt) {
           var modal = $modalStack.getTop();
@@ -1647,6 +1647,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         // IW CUSTOM
         // We don't use animation with our modals so don't even considerate it, causes weird glitches with view anyway
         // removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, 300, function() {
+          modalWindow.modalDomEl.remove();
           modalWindow.modalScope.$destroy();
           body.toggleClass(OPENED_MODAL_CLASS, openedWindows.length() > 0);
           checkRemoveBackdrop();
@@ -1660,6 +1661,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
             // IW CUSTOM
             // We don't use animation with our modals so don't even considerate it, causes weird glitches with view anyway
             // removeAfterAnimate(backdropDomEl, backdropScope, 150, function () {
+              backdropDomEl.remove();
               backdropScopeRef.$destroy();
               backdropScopeRef = null;
             // });
