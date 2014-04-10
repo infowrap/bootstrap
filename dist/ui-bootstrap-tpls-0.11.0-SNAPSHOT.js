@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
 
- * Version: 0.11.0-SNAPSHOT - 2014-04-09
+ * Version: 0.11.0-SNAPSHOT - 2014-04-10
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.alert","ui.bootstrap.bindHtml","ui.bootstrap.buttons","ui.bootstrap.carousel","ui.bootstrap.position","ui.bootstrap.datepicker","ui.bootstrap.dropdown","ui.bootstrap.modal","ui.bootstrap.pagination","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.progressbar","ui.bootstrap.rating","ui.bootstrap.tabs","ui.bootstrap.timepicker","ui.bootstrap.typeahead"]);
@@ -1550,7 +1550,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
       templateUrl: 'template/modal/backdrop.html',
       link: function (scope) {
 
-        // scope.animate = false;
+        scope.animate = false;
 
         scope.close = function (evt) {
           var modal = $modalStack.getTop();
@@ -1562,9 +1562,9 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         };
 
         //trigger CSS transitions
-        // $timeout(function () {
-        //   scope.animate = true;
-        // });
+        $timeout(function () {
+          scope.animate = true;
+        });
       }
     };
   }])
@@ -1582,12 +1582,12 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
       link: function (scope, element, attrs) {
         scope.windowClass = attrs.windowClass || '';
 
-        // $timeout(function () {
-        //   // trigger CSS transitions
-        //   scope.animate = true;
-        //   // focus a freshly-opened modal
-        //   element[0].focus();
-        // });
+        $timeout(function () {
+          // trigger CSS transitions
+          scope.animate = true;
+          // focus a freshly-opened modal
+          element[0].focus();
+        });
 
         scope.close = function (evt) {
           var modal = $modalStack.getTop();
@@ -1662,6 +1662,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
             // IW CUSTOM
             // We don't use animation with our modals so don't even considerate it, causes weird glitches with view anyway
             // removeAfterAnimate(backdropDomEl, backdropScope, 150, function () {
+              scope.animate = false;
               backdropDomEl.remove();
               backdropScopeRef.$destroy();
               backdropScopeRef = null;
