@@ -1647,6 +1647,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         // IW CUSTOM
         // We don't use animation with our modals so don't even considerate it, causes weird glitches with view anyway
         // removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, 300, function() {
+          modalWindow.modalScope.animate = false;
           modalWindow.modalDomEl.remove();
           modalWindow.modalScope.$destroy();
           body.toggleClass(OPENED_MODAL_CLASS, openedWindows.length() > 0);
@@ -1661,7 +1662,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
             // IW CUSTOM
             // We don't use animation with our modals so don't even considerate it, causes weird glitches with view anyway
             // removeAfterAnimate(backdropDomEl, backdropScope, 150, function () {
-              scope.animate = false;
+              backdropScope.animate = false;
               backdropDomEl.remove();
               backdropScopeRef.$destroy();
               backdropScopeRef = null;
