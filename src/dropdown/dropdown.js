@@ -5,7 +5,7 @@ angular.module('ui.bootstrap.dropdown', [])
 })
 
 .service('dropdownService', ['$document', function($document) {
-  var self = this, openScope = null;
+  var openScope = null;
 
   this.open = function( dropdownScope ) {
     if ( !openScope ) {
@@ -28,7 +28,16 @@ angular.module('ui.bootstrap.dropdown', [])
     }
   };
 
-  var closeDropdown = function() {
+  var closeDropdown = function( evt ) {
+    // This method may still be called during the same mouse event that
+    // unbound this event handler. So check openScope before proceeding.
+    if (!openScope) { return; }
+
+    var toggleElement = openScope.getToggleElement();
+    if ( evt && toggleElement && toggleElement[0].contains(evt.target) ) {
+        return;
+    }
+
     openScope.$apply(function() {
       openScope.isOpen = false;
     });
@@ -72,13 +81,17 @@ angular.module('ui.bootstrap.dropdown', [])
     return scope.isOpen;
   };
 
+  scope.getToggleElement = function() {
+    return self.toggleElement;
+  };
+
   scope.focusToggleElement = function() {
     if ( self.toggleElement ) {
       self.toggleElement[0].focus();
     }
   };
 
-  scope.$watch('isOpen', function( isOpen ) {
+  scope.$watch('isOpen', function( isOpen, wasOpen ) {
     $animate[isOpen ? 'addClass' : 'removeClass'](self.$element, openClass);
 
     if ( isOpen ) {
@@ -89,7 +102,9 @@ angular.module('ui.bootstrap.dropdown', [])
     }
 
     setIsOpen($scope, isOpen);
-    toggleInvoker($scope, { open: !!isOpen });
+    if (angular.isDefined(isOpen) && isOpen !== wasOpen) {
+      toggleInvoker($scope, { open: !!isOpen });
+    }
   });
 
   $scope.$on('$locationChangeSuccess', function() {
@@ -103,7 +118,6 @@ angular.module('ui.bootstrap.dropdown', [])
 
 .directive('dropdown', function() {
   return {
-    restrict: 'CA',
     controller: 'DropdownController',
     link: function(scope, element, attrs, dropdownCtrl) {
       dropdownCtrl.init( element );
@@ -113,7 +127,6 @@ angular.module('ui.bootstrap.dropdown', [])
 
 .directive('dropdownToggle', function() {
   return {
-    restrict: 'CA',
     require: '?^dropdown',
     link: function(scope, element, attrs, dropdownCtrl) {
       if ( !dropdownCtrl ) {
@@ -124,7 +137,6 @@ angular.module('ui.bootstrap.dropdown', [])
 
       var toggleDropdown = function(event) {
         event.preventDefault();
-        event.stopPropagation();
 
         if ( !element.hasClass('disabled') && !attrs.disabled ) {
           scope.$apply(function() {

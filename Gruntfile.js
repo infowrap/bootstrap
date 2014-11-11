@@ -1,3 +1,4 @@
+/* jshint node: true */
 var markdown = require('node-markdown').Markdown;
 
 module.exports = function(grunt) {
@@ -11,13 +12,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-conventional-changelog');
   grunt.loadNpmTasks('grunt-ngdocs');
+  grunt.loadNpmTasks('grunt-ddescribe-iit');
 
   // Project configuration.
   grunt.util.linefeed = '\n';
 
   grunt.initConfig({
-    ngversion: '1.2.10',
-    bsversion: '3.0.3',
+    ngversion: '1.2.16',
+    bsversion: '3.1.1',
     modules: [],//to be filled in by build task
     pkg: grunt.file.readJSON('package.json'),
     dist: 'dist',
@@ -138,6 +140,7 @@ module.exports = function(grunt) {
       },
       travis: {
         singleRun: true,
+        reporters: ['dots'],
         browsers: ['Firefox']
       },
       coverage: {
@@ -189,12 +192,17 @@ module.exports = function(grunt) {
         src: ['src/**/*.js', 'src/**/*.ngdoc'],
         title: 'API Documentation'
       }
+    },
+    'ddescribe-iit': {
+      files: [
+        'src/**/*.spec.js'
+      ]
     }
   });
 
   //register before and after test tasks so we've don't have to change cli
   //options on the goole's CI server
-  grunt.registerTask('before-test', ['enforce', 'jshint', 'html2js']);
+  grunt.registerTask('before-test', ['enforce', 'ddescribe-iit', 'jshint', 'html2js']);
   grunt.registerTask('after-test', ['build', 'copy']);
 
   //Rename our watch task to 'delta', then make actual 'watch'
@@ -205,7 +213,7 @@ module.exports = function(grunt) {
   // Default task.
   grunt.registerTask('default', ['before-test', 'test', 'after-test']);
   // Infowrap build
-  grunt.registerTask('infowrap', ['jshint', 'html2js', 'after-test']);
+  grunt.registerTask('infowrap', ['html2js', 'after-test']);
 
   grunt.registerTask('enforce', 'Install commit message enforce script if it doesn\'t exist', function() {
     if (!grunt.file.exists('.git/hooks/commit-msg')) {
