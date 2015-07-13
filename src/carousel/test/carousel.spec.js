@@ -73,6 +73,51 @@ describe('carousel', function() {
       expect(indicators.length).toBe(3);
     });
 
+    it('should stop cycling slides forward when noWrap is truthy', function () {
+      elm = $compile(
+          '<carousel interval="interval" no-wrap="noWrap">' +
+            '<slide ng-repeat="slide in slides" active="slide.active">' +
+              '{{slide.content}}' +
+            '</slide>' +
+          '</carousel>'
+        )(scope);
+
+      scope.noWrap = true;
+      scope.$apply();
+
+      scope = elm.isolateScope();
+      spyOn(scope, 'pause');
+
+      for (var i = 0; i < scope.slides.length - 1; ++i) {
+        scope.next();
+      }
+      testSlideActive(scope.slides.length - 1);
+      scope.next();
+      testSlideActive(scope.slides.length - 1);
+      expect(scope.pause).toHaveBeenCalled();
+    });
+
+    it('should stop cycling slides backward when noWrap is truthy', function () {
+      elm = $compile(
+          '<carousel interval="interval" no-wrap="noWrap">' +
+            '<slide ng-repeat="slide in slides" active="slide.active">' +
+              '{{slide.content}}' +
+            '</slide>' +
+          '</carousel>'
+        )(scope);
+
+      scope.noWrap = true;
+      scope.$apply();
+
+      scope = elm.isolateScope();
+      spyOn(scope, 'pause');
+
+      testSlideActive(0);
+      scope.prev();
+      testSlideActive(0);
+      expect(scope.pause).toHaveBeenCalled();
+    });
+
     it('should hide navigation when only one slide', function () {
       scope.slides=[{active:false,content:'one'}];
       scope.$apply();
@@ -146,7 +191,7 @@ describe('carousel', function() {
       testSlideActive(1);
     });
 
-    it('shouldnt go forward if interval is NaN or negative', function() {
+    it('shouldnt go forward if interval is NaN or negative or has no slides', function() {
       testSlideActive(0);
       var previousInterval = scope.interval;
       scope.$apply('interval = -1');
@@ -159,6 +204,9 @@ describe('carousel', function() {
       $interval.flush(1000);
       testSlideActive(1);
       scope.$apply('interval = 1000');
+      $interval.flush(1000);
+      testSlideActive(2);
+      scope.$apply('slides = []');
       $interval.flush(1000);
       testSlideActive(2);
     });
@@ -262,9 +310,79 @@ describe('carousel', function() {
       testSlideActive(2);
       $interval.flush(scope.interval);
       testSlideActive(0);
-      spyOn($interval, 'cancel').andCallThrough();
+      spyOn($interval, 'cancel').and.callThrough();
       scope.$destroy();
       expect($interval.cancel).toHaveBeenCalled();
+    });
+
+    describe('slide order', function() {
+
+      beforeEach(function() {
+        scope.slides = [
+          {active:false,content:'one', id:1},
+          {active:false,content:'two', id:2},
+          {active:false,content:'three', id:3}
+        ];
+        elm = $compile(
+          '<carousel interval="interval" no-transition="true" no-pause="nopause">' +
+            '<slide ng-repeat="slide in slides | orderBy: \'id\' " active="slide.active" index="$index">' +
+              '{{slide.content}}' +
+            '</slide>' +
+          '</carousel>'
+        )(scope);
+        scope.$apply();
+        scope.slides[0].id = 3;
+        scope.slides[1].id = 1;
+        scope.slides[2].id = 2;
+        scope.$apply();
+      });
+
+      it('should change dom when an order of the slides was changed', function() {
+        testSlideActive(0);
+        var contents = elm.find('div.item');
+        expect(contents.length).toBe(3);
+        expect(contents.eq(0).text()).toBe('two');
+        expect(contents.eq(1).text()).toBe('three');
+        expect(contents.eq(2).text()).toBe('one');
+      });
+
+      it('should select next after order change', function() {
+        testSlideActive(0);
+        var next = elm.find('a.right');
+        next.click();
+        testSlideActive(1);
+      });
+
+      it('should select prev after order change', function() {
+        testSlideActive(0);
+        var prev = elm.find('a.left');
+        prev.click();
+        testSlideActive(2);
+      });
+
+      it('should add slide in the specified position', function() {
+        testSlideActive(0);
+        scope.slides[2].id = 4;
+        scope.slides.push({active:false,content:'four', id:2});
+        scope.$apply();
+        var contents = elm.find('div.item');
+        expect(contents.length).toBe(4);
+        expect(contents.eq(0).text()).toBe('two');
+        expect(contents.eq(1).text()).toBe('four');
+        expect(contents.eq(2).text()).toBe('one');
+        expect(contents.eq(3).text()).toBe('three');
+      });
+
+      it('should remove slide after order change', function() {
+        testSlideActive(0);
+        scope.slides.splice(1, 1);
+        scope.$apply();
+        var contents = elm.find('div.item');
+        expect(contents.length).toBe(2);
+        expect(contents.eq(0).text()).toBe('three');
+        expect(contents.eq(1).text()).toBe('one');
+      });
+
     });
 
   });
@@ -276,7 +394,7 @@ describe('carousel', function() {
 
     beforeEach(function() {
       scope = $rootScope.$new();
-      ctrl = $controller('CarouselController', {$scope: scope, $element: null});
+      ctrl = $controller('CarouselController', {$scope: scope, $element: angular.element('<div></div>')});
       for(var i = 0;i < slides.length;i++){
         ctrl.addSlide(slides[i]);
       }
@@ -326,17 +444,17 @@ describe('carousel', function() {
       });
 
       it('issue 1414 - should not continue running timers after scope is destroyed', function() {
-        spyOn(scope, 'next').andCallThrough();
+        spyOn(scope, 'next').and.callThrough();
         scope.interval = 2000;
         scope.$digest();
 
         $interval.flush(scope.interval);
-        expect(scope.next.calls.length).toBe(1);
+        expect(scope.next.calls.count()).toBe(1);
 
         scope.$destroy();
 
         $interval.flush(scope.interval);
-        expect(scope.next.calls.length).toBe(1);
+        expect(scope.next.calls.count()).toBe(1);
       });
     });
   });
