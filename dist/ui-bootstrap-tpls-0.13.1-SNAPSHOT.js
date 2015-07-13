@@ -2149,6 +2149,15 @@ angular.module('ui.bootstrap.modal', [])
           $animate.removeClass(element, attrs.modalInClass).then(done);
         });
       }
+
+      scope.close = function (evt) {
+        var modal = $modalStack.getTop();
+        if (modal && modal.value.backdrop && modal.value.backdrop != 'static' && (evt.target === evt.currentTarget)) {
+          evt.preventDefault();
+          evt.stopPropagation();
+          $modalStack.dismiss(modal.key, 'backdrop click');
+        }
+      };
     }
   }])
 
