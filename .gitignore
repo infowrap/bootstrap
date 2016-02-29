@@ -9,12 +9,13 @@ lib-cov
 *.swp
 *.swo
 .DS_Store
+.idea
 
 pids
 logs
 results
 # test coverage files
-coverage/
+.coverage/
 
 node_modules
 npm-debug.log

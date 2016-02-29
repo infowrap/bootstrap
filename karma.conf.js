@@ -18,6 +18,7 @@ module.exports = function(config) {
       'misc/test-lib/jquery-1.8.2.min.js',
       'node_modules/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
+      'node_modules/angular-sanitize/angular-sanitize.js',
       'misc/test-lib/helpers.js',
       'src/**/*.js',
       'template/**/*.js'
@@ -26,6 +27,7 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
+      'src/**/index.js',
       'src/**/docs/*'
     ],
 
@@ -33,13 +35,19 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      'src/*/{*.js,!(test)/**/*.js}': ['coverage']
     },
 
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['progress', 'coverage'],
+
+    coverageReporter: {
+      dir: '.coverage/',
+      type: 'html'
+    },
 
     reportSlowerThan: 100,
 
@@ -57,7 +65,7 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: false,
+    autoWatch: true,
 
 
     // start these browsers

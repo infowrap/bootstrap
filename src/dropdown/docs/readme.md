@@ -1,19 +1,63 @@
-
 Dropdown is a simple directive which will toggle a dropdown menu on click or programmatically.
-You can either use `is-open` to toggle or add inside a `<a dropdown-toggle>` element to toggle it when is clicked.
-There is also the `on-toggle(open)` optional expression fired when dropdown changes state.
 
-Add `dropdown-append-to-body` to the `dropdown` element to append to the inner `dropdown-menu` to the body.
-This is useful when the dropdown button is inside a div with `overflow: hidden`, and the menu would otherwise be hidden.
+This directive is composed by three parts:
 
-Add `keyboard-nav` to the `dropdown` element to enable navigation of dropdown list elements with the arrow keys.
+* `uib-dropdown` which transforms a node into a dropdown.
+* `uib-dropdown-toggle` which allows the dropdown to be toggled via click. This directive is optional.
+* `uib-dropdown-menu` which transforms a node into the popup menu.
 
-By default the dropdown will automatically close if any of its elements is clicked, you can change this behavior by setting the `auto-close` option as follows:
+Each of these parts need to be used as attribute directives.
 
-  * `always` - (Default) automatically closes the dropdown when any of its elements is clicked.
-  * `outsideClick` - closes the dropdown automatically only when the user clicks any element outside the dropdown.
-  * `disabled` - disables the auto close. You can then control the open/close status of the dropdown manually, by using `is-open`. Please notice that the dropdown will still close if the toggle is clicked, the `esc` key is pressed or another dropdown is open. The dropdown will no longer close on `$locationChangeSuccess` events.
+### uib-dropdown settings
 
-Optionally, you may specify a template for the dropdown menu using the `template-url` attribute. This is especially useful when you have multiple similar dropdowns in a repeater and you want to keep your HTML output lean and your number of scopes to a minimum. The template has full access to the scope in which the dropdown lies.
+* `auto-close`
+  _(Default: `always`)_ -
+  Controls the behavior of the menu when clicked.
+  * `always` - Automatically closes the dropdown when any of its elements is clicked.
+  * `disabled` - Disables the auto close. You can control it manually with `is-open`. It still gets closed if the toggle is clicked, `esc` is pressed or another dropdown is open. It also won't be closed on `$locationchangeSuccess`.
+  * `outsideClick` - Closes the dropdown automatically only when the user clicks any element outside the dropdown.
 
-Example: `<ul class="dropdown-menu" template-url="custom-dropdown.html"></ul>`.
+* `dropdown-append-to`
+  <small class="badge">$</small>
+  _(Default: `null`)_ -
+  Appends the inner dropdown-menu to an arbitrary DOM element.
+
+* `dropdown-append-to-body`
+  <small class="badge">B</small>
+  _(Default: `false`)_ -
+  Appends the inner dropdown-menu to the body element.
+
+* `is-open`
+  <small class="badge">$</small>
+  <i class="glyphicon glyphicon-eye-open"></i>
+  _(Default: `false`)_ -
+  Defines whether or not the dropdown-menu is open. The `uib-dropdown-toggle` will toggle this attribute on click.
+
+* `keyboard-nav`:
+  <small class="badge">B</small>
+  _(Default: `false`)_ -
+  Enables navigation of dropdown list elements with the arrow keys.
+
+* `on-toggle(open)`
+  <small class="badge">$</small> -
+  An optional expression called when the dropdown menu is opened or closed.
+
+### uib-dropdown-menu settings
+
+* `template-url`
+  _(Default: `none`)_ -
+  You may specify a template for the dropdown menu. Check the demos for an example.
+
+### Additional settings `uibDropdownConfig`
+
+* `appendToOpenClass`
+  _(Default: `uib-dropdown-open`)_ -
+  Class to apply when the dropdown is open and appended to a different DOM element.
+
+* `openClass`
+  _(Default: `open`)_ -
+  Class to apply when the dropdown is open.
+
+### Known issues
+
+For usage with ngTouch, it is recommended to use the programmatic `is-open` trigger with ng-click - this is due to ngTouch decorating ng-click to prevent propagation of the event.
